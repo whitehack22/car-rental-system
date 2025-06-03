@@ -1,0 +1,1 @@
+ALTER TABLE "customer" ADD COLUMN "Password" varchar(20) NOT NULL;

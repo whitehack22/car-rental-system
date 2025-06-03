@@ -1,0 +1,1 @@
+ALTER TABLE "customer" ALTER COLUMN "Password" SET DATA TYPE varchar(255);
