@@ -122,3 +122,14 @@ export const getReservationsByIdController = async (req: Request, res: Response)
     return;
   }
 };
+
+//get reservations with car and customer
+export const getReservationsDetailsController = async (req: Request, res: Response) => {
+  try {
+    const result = await reservationService.getReservationsWithCustomerAndCar();
+    res.status(200).json(result);
+  } catch (error) {
+    console.error("Error fetching reservation details:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};

@@ -1,6 +1,6 @@
 import { Express } from "express";
 import { createReservationController, deleteReservationController, getAllReservationsController, 
-    getReservationByIdController, updateReservationController } from "./reservation.controller";
+    getReservationByIdController, getReservationsDetailsController, updateReservationController } from "./reservation.controller";
 
 
 
@@ -72,6 +72,18 @@ const reservation = (app: Express) => {
             }
         }
     )
+
+    //get reservations with car and customer
+    app.route("/api/reservations-details").get(
+        async (req, res, next) => {
+            try {
+                await getReservationsDetailsController(req, res)
+            } catch (error) {
+                next(error)
+            }
+        }
+    )
+
 }
 
 

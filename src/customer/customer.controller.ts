@@ -144,7 +144,7 @@ export const loginCustomerController = async (req: Request, res: Response) => {
             return res.status(404).json({ message: "Customer not found" });
         }
 
-        // verify the password 
+        // verify the password - 1234donkey
         const customerMatch = await bcrypt.compareSync(customer.password, customerExist.password)
         if (!customerMatch) {
             return res.status(401).json({ message: "Invalid credentials" });
@@ -156,7 +156,8 @@ export const loginCustomerController = async (req: Request, res: Response) => {
             customer_id: customerExist.customerID,
             first_name: customerExist.firstName,
             last_name: customerExist.lastName,
-            exp: Math.floor(Date.now() / 1000) + 60
+            role: customerExist.role,
+            exp: Math.floor(Date.now() / 1000) + 60 * 60 * 3
         }
 
         //generate the JWT token
@@ -176,7 +177,8 @@ export const loginCustomerController = async (req: Request, res: Response) => {
                 last_name: customerExist.lastName,
                 email: customerExist.email,
                 phoneNumber: customerExist.phoneNumber,
-                address: customerExist.address
+                address: customerExist.address,
+                role: customerExist.role
             }
         })
   }  catch (error: any) {
@@ -184,3 +186,25 @@ export const loginCustomerController = async (req: Request, res: Response) => {
     
   }
 }
+
+// Get customers and their bookings
+export const getCustomersAndBookingsController = async (req: Request, res: Response) => {
+  try {
+    const result = await customerService.getCustomersWithBookings();
+    res.status(200).json(result);
+  } catch (error) {
+    console.error("Error fetching customers with bookings:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+//Get customers with their bookings, car and location details
+export const getDetailedCustomerBookingsController = async (req: Request, res: Response) => {
+  try {
+    const result = await customerService.getCustomersWithBookingsAndCarDetails();
+    res.status(200).json(result);
+  } catch (error) {
+    console.error("Error fetching detailed customer bookings:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};

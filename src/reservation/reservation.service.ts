@@ -46,4 +46,12 @@ export const getReservationsById = async (id: number) => {
     return reservations;
 }
 
-
+//get reservations with customer and car
+export const getReservationsWithCustomerAndCar = async () => {
+  return await db.query.ReservationTable.findMany({
+    with: {
+      customer: true,
+      car: true,
+    }
+  });
+};

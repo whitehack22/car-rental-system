@@ -1,6 +1,7 @@
 import { Express } from "express";
 import { createPaymentController, deletePaymentController, getAllPaymentsController, 
     getPaymentByIdController, getPaymentsByIdController, updatePaymentController } from "./payment.controller";
+import { adminRoleAuth, bothRoleAuth, userRoleAuth } from "../middleware/bearAuth";
 
 
 
@@ -8,6 +9,7 @@ import { createPaymentController, deletePaymentController, getAllPaymentsControl
 const payment = (app: Express) => {
     // create payment
     app.route("/api/payment").post(
+        adminRoleAuth,
         async (req, res, next) => {
             try {
                 await createPaymentController(req, res)
@@ -19,6 +21,7 @@ const payment = (app: Express) => {
 
     //get all payments
     app.route("/api/payments").get(
+        adminRoleAuth,
         async (req, res, next) => {
             try {
                 await getAllPaymentsController(req, res)
@@ -30,6 +33,7 @@ const payment = (app: Express) => {
 
     //get payment by ID
     app.route("/api/payment/:id").get(
+        bothRoleAuth,
         async (req, res, next) => {
             try {
                 await getPaymentByIdController(req, res)
@@ -41,6 +45,7 @@ const payment = (app: Express) => {
 
     //update payment
     app.route("/api/payment/:id").put(
+        adminRoleAuth,
         async (req, res, next) => {
             try {
                 await updatePaymentController(req, res)
@@ -52,6 +57,7 @@ const payment = (app: Express) => {
 
     //delete payment
     app.route("/api/payment/:id").delete(
+        adminRoleAuth,
         async (req, res, next) => {
             try {
                 await deletePaymentController(req, res)
@@ -63,6 +69,7 @@ const payment = (app: Express) => {
 
     //get multiple payments by ID
     app.route("/api/payments/:id").get(
+        userRoleAuth,
         async (req, res, next) => {
             try {
                 await getPaymentsByIdController(req, res)

@@ -58,8 +58,35 @@ export const customerLoginService = async (customer:TICustomer) => {
             email: true,
             password: true,
             phoneNumber: true,
-            address: true
+            address: true,
+            role: true
         }, where: sql`${CustomerTable.email} = ${email}`
     })
 
 }
+
+// Get all customers with their bookings
+export const getCustomersWithBookings = async () => {
+  return await db.query.CustomerTable.findMany({
+    with: {
+      bookings: true,
+    },
+  });
+};
+
+// get customers with bookings, car and location details
+export const getCustomersWithBookingsAndCarDetails = async () => {
+  return await db.query.CustomerTable.findMany({
+    with: {
+      bookings: {
+        with: {
+          car: {
+            with: {
+              location: true
+            }
+          }
+        }
+      }
+    }
+  });
+};
