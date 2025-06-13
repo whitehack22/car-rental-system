@@ -3,6 +3,7 @@ import * as customerService from "./customer.service";
 import bcrypt from "bcryptjs";
 import "dotenv/config"
 import jwt from "jsonwebtoken";
+import { sendEmail } from "../mailer/mailer";
 
 // get all customers
 export const getAllCustomersController = async (_req: Request, res: Response) => {
@@ -47,18 +48,37 @@ export const getCustomerByIdController = async (req: Request, res: Response) => 
 export const createCustomerController = async (req: Request, res: Response) => {
   try {
 
-    const user = req.body;
-    const password = user.password;
+    const customer = req.body;
+    const password = customer.password;
     const hashedPassword = await bcrypt.hashSync(password, 10)
-    user.password = hashedPassword
+    customer.password = hashedPassword
 
-    const customer = await customerService.createCustomer(req.body);
+// Generate a 6-digit verification code
+    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+    customer.verificationCode = verificationCode;
+    customer.isVerified = false;
 
-    if (!customer) {
+    const createCustomer = await customerService.createCustomer(req.body);
+
+    if (!createCustomer) {
       res.status(400).json({ message: "Customer not created" });
       return;
     }
-    res.status(201).json({ message: "Customer created successfully", customer });
+    try {
+       await sendEmail(
+                customer.email,
+                "Verify your account",
+                `Hello ${customer.lastName}, your verification code is: ${verificationCode}`,
+                `<div>
+                <h2>Hello ${customer.lastName},</h2>
+                <p>Your verification code is: <strong>${verificationCode}</strong></p>
+                 <p>Enter this code to verify your account.</p>
+                </div>`
+            );
+    } catch (emailError) {
+      console.error("Failed to send registration email:", emailError);
+    }
+    res.status(201).json({ message: "User created. Verification code sent to email." });
     return;
   } catch (error: any) {
     console.error("Error creating customer:", error);
@@ -66,6 +86,49 @@ export const createCustomerController = async (req: Request, res: Response) => {
     return;
   }
 };
+
+//Verify customer controller
+export const verifyCustomerController = async (req: Request, res: Response) => {
+   const { email, code } = req.body;
+   try {
+     const customer = await customerService.getCustomerByEmailService(email);
+     if (!customer) {
+          res.status(404).json({ message: "Customer not found" });
+          return;
+        }
+
+        if (customer.verificationCode === code) {
+            await customerService.verifyCustomerService(email);
+          
+           // Send verification success email
+          try {
+             await sendEmail(
+                    customer.email,
+                    "Account Verified Successfully",
+                    `Hello ${customer.lastName}, your account has been verified. You can now log in and use all features.`,
+                    `<div>
+                    <h2>Hello ${customer.lastName},</h2>
+                    <p>Your account has been <strong>successfully verified</strong>!</p>
+                     <p>You can now log in and enjoy our services.</p>
+                     </div>`
+                )
+          } catch ( error: any ) {
+             console.error("Failed to send verification success email:", error);
+          }
+          res.status(200).json({ message: "User verified successfully" })
+          return;
+      } else {
+          res.status(400).json({ message: "Invalid verification code" })
+          return;
+        }
+
+   } catch (error: any) {
+      res.status(500).json({ error: error.message })
+      return;
+   }
+}
+
+
 
 //Update customer controller
 export const updateCustomerController = async (req: Request, res: Response) => {
@@ -104,6 +167,23 @@ export const deleteCustomerController = async (req: Request, res: Response) => {
     console.error("Error deleting customer:", error);
     res.status(500).json({ error: error.message || "Internal Server Error" });
     return;
+  }
+};
+
+//Get customers with their bookings, car and location details
+export const getDetailedCustomerBookingsController = async (req: Request, res: Response) => {
+  try {
+    const custID = parseInt(req.params.custID, 10);
+
+    if (isNaN(custID)) {
+      res.status(400).json({ message: "Invalid ID" });
+      return;
+    }
+    const result = await customerService.getCustomersWithBookingsAndCarDetails(custID);
+    res.status(200).json(result);
+  } catch (error) {
+    console.error("Error fetching detailed customer bookings:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 };
 
@@ -198,13 +278,3 @@ export const getCustomersAndBookingsController = async (req: Request, res: Respo
   }
 };
 
-//Get customers with their bookings, car and location details
-export const getDetailedCustomerBookingsController = async (req: Request, res: Response) => {
-  try {
-    const result = await customerService.getCustomersWithBookingsAndCarDetails();
-    res.status(200).json(result);
-  } catch (error) {
-    console.error("Error fetching detailed customer bookings:", error);
-    res.status(500).json({ error: "Internal server error" });
-  }
-};

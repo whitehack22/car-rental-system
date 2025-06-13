@@ -27,14 +27,24 @@ export const createCar = async (car: TICar) => {
 }
 
 //Update car details
-export const updateCar =  async (id: number, car: TICar) => {
-    await db.update(CarTable).set(car).where(eq(CarTable.carID, id))
-    return "Car updated successfully";
+export const updateCar = async (id: number, car: TICar) => {
+  const updated = await db
+    .update(CarTable)
+    .set(car)
+    .where(eq(CarTable.carID, id))
+    .returning(); 
+
+  if (!updated || updated.length === 0) {
+    return null;
+  }
+
+  return updated[0]; 
 };
+
 
 //deleting car by ID
 export const deleteCar = async (id: number) => {
-  await db.delete(CarTable).where(eq(CarTable.carID, id)).returning()
+  await db.delete(CarTable).where(eq(CarTable.carID, id))
   return "Car deleted successfully";
 };
 

@@ -1,7 +1,8 @@
 import { Express } from "express";
 import { createCustomerController, deleteCustomerController, getAllCustomersController, 
     getCustomerByIdController, getCustomersAndBookingsController, getCustomersByIdController, 
-    getDetailedCustomerBookingsController, loginCustomerController, updateCustomerController } from "./customer.controller";
+    getDetailedCustomerBookingsController, loginCustomerController, updateCustomerController, 
+    verifyCustomerController} from "./customer.controller";
 
 
 const customer = (app: Express) => {
@@ -94,7 +95,7 @@ const customer = (app: Express) => {
     ) 
 
      // get customers with bookings, car and location details
-    app.route("/api/customers-bookings-cars").get(
+    app.route("/api/customers-bookings-cars/:custID").get(
         async (req, res, next) => {
            try {
                 await getDetailedCustomerBookingsController(req, res)
@@ -102,7 +103,18 @@ const customer = (app: Express) => {
                 next()
             } 
         }
-    ) 
+    )
+
+     // verify customer route
+    app.route("/api/customer/verify").post(
+        async (req, res, next) => {
+            try {
+                await verifyCustomerController(req, res)
+            } catch (error) {
+                next(error)
+            }
+        }
+    )
 }
 
 

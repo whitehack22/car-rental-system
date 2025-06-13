@@ -34,7 +34,7 @@ export const updatePayment =  async (id: number, payment: TIPayment) => {
 
 //deleting payment by ID
 export const deletePayment = async (id: number) => {
-  await db.delete(PaymentTable).where(eq(PaymentTable.paymentID, id)).returning()
+  await db.delete(PaymentTable).where(eq(PaymentTable.paymentID, id))
   return "Payment deleted successfully";
 };
 

@@ -1,3 +1,4 @@
+/* istanbul ignore next */
 import express from "express";
 import customer from "./customer/customer.route";
 import location from "./location/location.route";
@@ -8,27 +9,29 @@ import maintenance from "./maintenance/maintenance.route";
 import payment from "./payment/payment.route";
 import reservation from "./reservation/reservation.route";
 
-const app = express();
-const port = 3000;
+const initilizeApp = () => {
+  const app = express();
 
-//middleware
-app.use(express.json());
+  //middleware
+  app.use(express.json());
 
-//route
-customer(app);
-location(app);
-car(app);
-booking(app);
-insurance(app);
-maintenance(app);
-payment(app);
-reservation(app);
+  //route
+  customer(app);
+  location(app);
+  car(app);
+  booking(app);
+  insurance(app);
+  maintenance(app);
+  payment(app);
+  reservation(app);
 
 
-app.get('/', (req, res) => {
-  res.send('Hello Express!')
-})
+  app.get('/', (req, res) => {
+    res.send('Hello Express!')
+  })
 
-app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
-})
+  return app;
+}
+
+const app = initilizeApp();
+export default app;

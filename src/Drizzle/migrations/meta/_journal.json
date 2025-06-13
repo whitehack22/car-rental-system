@@ -29,6 +29,13 @@
       "when": 1749036240010,
       "tag": "0003_spotty_professor_monster",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1749438246493,
+      "tag": "0004_narrow_blur",
+      "breakpoints": true
     }
   ]
 }

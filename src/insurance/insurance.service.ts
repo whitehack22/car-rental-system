@@ -34,7 +34,7 @@ export const updateInsurance =  async (id: number, insurance: TIInsurance) => {
 
 //deleting insurance by ID
 export const deleteInsurance = async (id: number) => {
-  await db.delete(InsuranceTable).where(eq(InsuranceTable.insuranceID, id)).returning()
+  await db.delete(InsuranceTable).where(eq(InsuranceTable.insuranceID, id))
   return "Insurance deleted successfully";
 };
 

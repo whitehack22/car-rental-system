@@ -69,6 +69,10 @@ export const updateLocationController = async (req: Request, res: Response) => {
     }
 
     const updated = await locationService.updateLocation(id, req.body);
+
+    if (!updated) {
+      return res.status(404).json({ message: "Location not found" });
+    }
     res.status(200).json({ message: "Location updated successfully", location: updated });
     return;
   } catch (error: any) {

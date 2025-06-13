@@ -69,6 +69,11 @@ export const updateCarController = async (req: Request, res: Response) => {
     }
 
     const updated = await carService.updateCar(id, req.body);
+
+    if (!updated) {
+      return res.status(404).json({ message: "Car not found" });
+    }
+
     res.status(200).json({ message: "Car updated successfully", car: updated });
     return;
   } catch (error: any) {

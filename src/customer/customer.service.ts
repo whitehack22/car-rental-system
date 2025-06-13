@@ -19,11 +19,22 @@ export const getCustomerById = async (id: number) => {
 
 //Create a new customer
 export const createCustomer = async (customer: TICustomer) => {
-    const [inserted] = await db.insert(CustomerTable).values(customer).returning()
-    if (inserted) {
-        return inserted
-    }
-    return null
+    await db.insert(CustomerTable).values(customer)
+    return "Customer created successfully";
+}
+
+//Get user by email service
+export const getCustomerByEmailService = async (email: string) => {
+   return await db.query.CustomerTable.findFirst({
+        where: sql`${CustomerTable.email} = ${email}`
+    });
+};
+
+// Verify user service
+export const verifyCustomerService = async(email: string) => {
+  await db.update(CustomerTable)
+        .set({ isVerified: true, verificationCode: null })
+        .where(sql`${CustomerTable.email} = ${email}`);
 }
 
 //Update customer details
@@ -34,7 +45,7 @@ export const updateCustomer =  async (id: number, customer: TICustomer) => {
 
 //deleting customer by ID
 export const deleteCustomer = async (id: number) => {
-  await db.delete(CustomerTable).where(eq(CustomerTable.customerID, id)).returning()
+  await db.delete(CustomerTable).where(eq(CustomerTable.customerID, id))
   return "Customer deleted successfully";
 };
 
@@ -75,8 +86,9 @@ export const getCustomersWithBookings = async () => {
 };
 
 // get customers with bookings, car and location details
-export const getCustomersWithBookingsAndCarDetails = async () => {
-  return await db.query.CustomerTable.findMany({
+export const getCustomersWithBookingsAndCarDetails = async (CustomerID: number) => {
+  const custID =  await db.query.CustomerTable.findFirst({
+    where: eq(CustomerTable.customerID, CustomerID),
     with: {
       bookings: {
         with: {
@@ -89,4 +101,5 @@ export const getCustomersWithBookingsAndCarDetails = async () => {
       }
     }
   });
+  return custID;
 };

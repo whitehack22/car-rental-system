@@ -28,13 +28,22 @@ export const createLocation = async (location: TILocation) => {
 
 //Update location details
 export const updateLocation =  async (id: number, location: TILocation) => {
-    await db.update(LocationTable).set(location).where(eq(LocationTable.locationID, id))
-    return "Location updated successfully";
+    const updated = await db
+    .update(LocationTable)
+    .set(location)
+    .where(eq(LocationTable.locationID, id))
+    .returning(); 
+
+  if (!updated || updated.length === 0) {
+    return null;
+  }
+
+  return updated[0];
 };
 
 //deleting location by ID
 export const deleteLocation = async (id: number) => {
-  await db.delete(LocationTable).where(eq(LocationTable.locationID, id)).returning()
+  await db.delete(LocationTable).where(eq(LocationTable.locationID, id))
   return "Location deleted successfully";
 };
 

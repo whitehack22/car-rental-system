@@ -34,7 +34,7 @@ export const updateMaintenance =  async (id: number, maintenance: TIMaintenance)
 
 //deleting maintenance by ID
 export const deleteMaintenance = async (id: number) => {
-  await db.delete(MaintenanceTable).where(eq(MaintenanceTable.maintenanceID, id)).returning()
+  await db.delete(MaintenanceTable).where(eq(MaintenanceTable.maintenanceID, id))
   return "Maintenance deleted successfully";
 };
 

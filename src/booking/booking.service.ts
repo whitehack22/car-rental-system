@@ -34,7 +34,7 @@ export const updateBooking =  async (id: number, booking: TIBooking) => {
 
 //deleting booking by ID
 export const deleteBooking = async (id: number) => {
-  await db.delete(BookingsTable).where(eq(BookingsTable.bookingID, id)).returning()
+  await db.delete(BookingsTable).where(eq(BookingsTable.bookingID, id))
   return "Booking deleted successfully";
 };
 
